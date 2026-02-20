@@ -58,11 +58,23 @@ function renderSummary(container, data) {
 
   const html = `
     <div class="result-container">
+    <div class="result-container">
       <!-- 진단서 헤드라인 -->
-      <h2 class="result-title">
-        📜 2026년 병오년(丙午年)<br>
-        당신의 '운세 건강' 정밀 진단서
-      </h2>
+      <header class="result-header">
+        <div class="diagnostic-badge">
+          <span class="badge-dot"></span>
+          <span class="badge-label">OFFICIAL DIAGNOSTIC REPORT</span>
+        </div>
+        <h2 class="result-title">
+          2026년 병오년(丙午年)<br>
+          <span>운세 건강 정밀 진단서</span>
+        </h2>
+        <div class="diagnostic-meta">
+          <span>ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()}</span>
+          <span class="meta-divider">|</span>
+          <span>진단일: ${new Date().toLocaleDateString('ko-KR')}</span>
+        </div>
+      </header>
 
       <!-- 사주 요약 카드 -->
       <div class="saju-summary-card">
@@ -127,17 +139,24 @@ function renderSummary(container, data) {
 function renderCategories(categories) {
   if (!categories || Object.keys(categories).length === 0) return '';
 
-  return Object.values(categories).map((cat, index) => {
-    const delay = `style="animation-delay: ${index * 0.08}s"`;
+  return `
+    <div class="fortune-grid">
+      ${Object.values(categories).map((cat, index) => {
     const icon = cat.emoji || getCategoryIcon(cat.name);
-
     return `
-      <div class="fortune-card" ${delay}>
-        <h3>${icon} ${cat.name}</h3>
-        <p>${cat.text || ''}</p>
-      </div>
-    `;
-  }).join('');
+          <div class="fortune-card glass-morphism" style="animation-delay: ${0.2 + index * 0.1}s">
+            <div class="card-header">
+              <span class="card-icon">${icon}</span>
+              <h3 class="card-title">${cat.name}</h3>
+            </div>
+            <div class="card-body">
+              <p>${cat.text || ''}</p>
+            </div>
+          </div>
+        `;
+  }).join('')}
+    </div>
+  `;
 }
 
 // ──────────────────────────────────────

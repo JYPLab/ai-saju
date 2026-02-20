@@ -36,9 +36,9 @@
     --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
     --shadow-gold: 0 0 24px rgba(255, 215, 0, 0.18);
 
-    /* 타이포그래피 — 명조체 우선, 1.2배 확대 */
-    --font-serif: 'Noto Serif KR', 'Batang', Georgia, serif;
-    --font-sans: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Typography - More balanced scale */
+    --font-serif: 'Noto Serif KR', serif;
+    --font-sans: 'Inter', 'Noto Sans KR', sans-serif;
 
     --text-xs: 0.9rem;
     /* was 0.75rem */
@@ -123,16 +123,88 @@ body {
     text-align: center;
 }
 
+/* Header & Hero */
+.header {
+    text-align: center;
+    padding: var(--space-xl) 0 var(--space-lg);
+    animation: fadeInUp 1s ease-out;
+}
+
+.header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid var(--border-gold);
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-md);
+}
+
+.badge-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
 .main-title {
     font-family: var(--font-serif);
-    font-size: var(--text-3xl);
-    font-weight: 700;
+    font-size: 2.5rem;
+    line-height: 1.15;
+    margin-bottom: var(--space-md);
+    background: none;
+    -webkit-text-fill-color: initial;
+    color: var(--text-primary);
+}
+
+.main-title span {
     background: var(--gradient-gold);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: var(--space-sm);
-    letter-spacing: -0.02em;
+    -webkit-text-fill-color: transparent;
+}
+
+.main-desc {
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Trust Indicators */
+.trust-indicators {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+    animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.trust-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.trust-val {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+    font-family: var(--font-sans);
+}
+
+.trust-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.trust-divider {
+    width: 1px;
+    height: 30px;
+    background: var(--border-subtle);
 }
 
 .sub-title {
@@ -264,8 +336,9 @@ body {
 .score-ring {
     position: relative;
     display: inline-block;
-    width: 160px;
-    height: 160px;
+    width: 180px;
+    height: 180px;
+    filter: drop-shadow(0 0 15px var(--accent-gold-dim));
 }
 
 .score-ring-svg {
@@ -280,34 +353,152 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
-    align-items: baseline;
-    gap: 2px;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
 }
 
 .score-number {
-    font-size: var(--text-4xl);
+    font-size: 3.5rem;
     font-weight: 900;
+    line-height: 1;
     background: var(--gradient-gold);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    font-family: var(--font-sans);
 }
 
 .score-unit {
-    font-size: var(--text-lg);
+    font-size: 1rem;
     color: var(--text-secondary);
+    font-weight: 700;
+    margin-top: -5px;
 }
 
 .score-grade {
-    font-size: var(--text-lg);
-    font-weight: 700;
-    margin-top: var(--space-sm);
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-top: 15px;
+    letter-spacing: -0.01em;
 }
 
 .score-desc {
     color: var(--text-muted);
-    font-size: var(--text-sm);
-    margin-top: var(--space-xs);
+    font-size: 0.95rem;
+    margin-top: 5px;
+}
+
+/* Glassmorphism Card */
+.glass-morphism {
+    background: var(--bg-glass) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle) !important;
+    box-shadow: var(--shadow-md);
+}
+
+.glass-morphism:hover {
+    border-color: var(--border-gold) !important;
+    transform: translateY(-3px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.diagnostic-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.badge-dot {
+    width: 6px;
+    height: 6px;
+    background: #e74c3c;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.badge-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+}
+
+.diagnostic-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.meta-divider {
+    margin: 0 8px;
+    opacity: 0.3;
+}
+
+.fortune-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+@media (max-width: 600px) {
+    .fortune-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.card-icon {
+    font-size: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.25rem !important;
+    margin-bottom: 0 !important;
 }
 
 /* Calendar Toggle (양력/음력) */

@@ -37,14 +37,14 @@ function renderInquiryForm(container) {
 
   container.innerHTML = `
     <div class="inquiry-card" id="inquiry-form-card">
-      <div class="inquiry-icon">📋</div>
-      <h3 class="inquiry-title">맞춤형 비방(秘方) 리포트 신청</h3>
+      <div class="inquiry-icon">🛡️</div>
+      <h3 class="inquiry-title">전문가 정밀 분석 & 비방(秘方) 리포트</h3>
       <p class="inquiry-desc">
-        전체 흐름은 위에서 확인하셨습니다.<br>
-        하지만 <strong>자녀의 혼사, 부동산 매매</strong> 등<br>
-        당신만의 더 구체적인 고민이 있으신가요?<br><br>
-        내용을 남겨주시면 <strong>12페이지 분량</strong>의<br>
-        '맞춤형 비방 리포트'를 이메일로 보내드립니다.
+        위에 표시된 요약은 기초적인 데이터 분석 결과입니다.<br>
+        <strong>자녀의 혼사, 부동산 매매, 나의 건강 수명</strong> 등<br>
+        더 구체적인 고민에 대한 답이 필요하신가요?<br><br>
+        전문가 정밀 대조를 거친 <strong>12페이지 분량</strong>의<br>
+        '프리미엄 비방 리포트'를 이메일로 보내드립니다.
       </p>
 
       <div class="inquiry-form" id="inquiry-form">
@@ -157,13 +157,15 @@ function attachInquiryHandler() {
     if (card) {
       card.innerHTML = `
         <div class="inquiry-success">
-          <div class="inquiry-success-icon">✅</div>
-          <h3 class="inquiry-success-title">신청이 접수되었어요!</h3>
+          <div class="inquiry-success-icon">🛡️</div>
+          <h3 class="inquiry-success-title">정밀 분석 접수가 완료되었습니다</h3>
           <p class="inquiry-success-desc">
-            전문가가 <strong>12페이지 맞춤형 비방 리포트</strong>와 함께<br>
-            고민에 대한 상세 답변을 이메일로 보내드릴게요.
+            전문가에게 데이터가 전달되었습니다.<br>
+            <strong>약 3시간 후</strong> 정밀 분석 리포트가 완성되면<br>
+            아래의 이메일로 즉시 발송해 드리겠습니다.
           </p>
           <p class="inquiry-success-email">📧 ${email}</p>
+          <p class="inquiry-success-note">※ 시스템 창을 닫으셔도 이메일로 발송됩니다.</p>
         </div>
       `;
     }

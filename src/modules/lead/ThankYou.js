@@ -29,11 +29,11 @@ function renderThankYou(email) {
     <div class="thankyou-container">
       <!-- 상단: 축하 아이콘 + 타이틀 -->
       <div class="thankyou-header">
-        <div class="thankyou-sparkle">🎊</div>
-        <h2 class="thankyou-title">진단서가 준비되었어요!</h2>
+        <div class="thankyou-sparkle">📜</div>
+        <h2 class="thankyou-title">정밀 분석 요청이 접수되었습니다</h2>
         <p class="thankyou-subtitle">
-          12페이지 맞춤형 운세 진단서를<br>
-          지금 바로 받아보세요
+          전문가의 정밀 대조 및 비방 작성을 위한<br>
+          세션 배정이 완료되었습니다.
         </p>
       </div>
 
@@ -118,12 +118,12 @@ function attachThankYouHandlers(overlay) {
           <div class="progress-fill"></div>
         </div>
         <div class="eta-box">
-          <span class="eta-label">진단서 도착 예정</span>
+          <span class="eta-label">리포트 발송 예정 시각</span>
           <span class="eta-time">${dateStr}${etaStr}</span>
         </div>
         <p class="status-note">
-          전문가의 정밀 대조 및 비방 처방을 거쳐<br>
-          상세 진단서가 곧 도착할 예정입니다.
+          사주 원국과 2026년 대운의 정밀 대조를 위해<br>
+          <strong>약 3시간의 분석 시간</strong>이 소요됩니다.
         </p>
       </div>
     `;
