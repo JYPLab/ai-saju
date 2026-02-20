@@ -49,16 +49,22 @@ function resetSession() {
 
 async function postToSheet(payload) {
     if (!SHEET_URL) {
-        console.log('[SheetSync] VITE_SHEET_URL 미설정 — 콘솔에만 기록합니다.');
-        console.log('[SheetSync] 데이터:', JSON.stringify(payload, null, 2));
-        bus.emit(bus.Events.DATA_SYNC_SUCCESS, { mode: 'console', sessionId: payload.session_id });
-        return { ok: true, mode: 'console' };
+        const errorMsg = 'VITE_SHEET_URL environment variable is not set. Data cannot be sent to Google Sheets.';
+        console.error(`[SheetSync] ${errorMsg}`);
+        console.log('[SheetSync] Payload that would have been sent:', JSON.stringify(payload, null, 2));
+
+        bus.emit(bus.Events.DATA_SYNC_ERROR, {
+            sessionId: payload.session_id,
+            error: errorMsg
+        });
+        return { ok: false, error: errorMsg };
     }
 
     let lastError = null;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
+            console.log(`[SheetSync] 전송 시도 (${attempt}/${MAX_RETRIES}) — 대상: ${SHEET_URL}`);
             // Google Apps Script는 CORS preflight를 지원하지 않으므로
             // text/plain으로 보내 simple request로 처리 (preflight 회피)
             const response = await fetch(SHEET_URL, {

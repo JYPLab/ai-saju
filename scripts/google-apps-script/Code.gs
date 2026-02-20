@@ -20,6 +20,8 @@
 // ⚠️ 아래 ID를 본인의 스프레드시트 ID로 바꾸세요
 const SPREADSHEET_ID = '14pDIwzlMpL2FRJMRvvQH3iadW5FRbqsBXxu34QSoiMM';
 const MAX_ROWS_PER_TAB = 300;
+const SENDER_NAME = '2026 병오년 운세 건강 검진 팀';
+const VERSION = '2026-02-20-V3'; // 이메일 강화 버전
 
 // ──────────────────────────────────────
 // POST 핸들러
@@ -176,7 +178,6 @@ function handleInquiry(ss, data) {
   const scheduledTime = calculateETAGAS();
 
   if (sessionSheet) {
-    const sessionIdCol = 1; // A열
     const dataRange = sessionSheet.getDataRange();
     const values = dataRange.getValues();
 
@@ -191,7 +192,26 @@ function handleInquiry(ss, data) {
         sessionSheet.getRange(i + 1, 17).setValue(scheduledTime); // scheduled_at
         sessionSheet.getRange(i + 1, 18).setValue('no'); // is_sent
 
-        return { ok: true, session_id: data.session_id, updated: true, scheduled_at: scheduledTime };
+        // 즉시 확인 메일 발송 (추가됨)
+        let emailSent = false;
+        let emailError = null;
+        try {
+          sendConfirmationEmail(data.email, data.question_text);
+          emailSent = true;
+        } catch (e) {
+          emailError = e.message;
+          Logger.log('이메일 발송 오류: ' + e.message);
+        }
+
+        return { 
+          ok: true, 
+          session_id: data.session_id, 
+          updated: true, 
+          scheduled_at: scheduledTime,
+          email_sent: emailSent,
+          email_error: emailError,
+          version: VERSION
+        };
       }
     }
   }
@@ -211,7 +231,62 @@ function handleInquiry(ss, data) {
     'no'
   ]);
 
-  return { ok: true, session_id: data.session_id, updated: false, fallback: true, scheduled_at: scheduledTime };
+  // 즉시 확인 메일 발송 (추가됨)
+  let fallbackEmailSent = false;
+  try {
+    sendConfirmationEmail(data.email, data.question_text);
+    fallbackEmailSent = true;
+  } catch (e) {
+    Logger.log('이메일 발송 오류 (폴백): ' + e.message);
+  }
+
+  return { 
+    ok: true, 
+    session_id: data.session_id, 
+    updated: false, 
+    fallback: true, 
+    scheduled_at: scheduledTime,
+    email_sent: fallbackEmailSent,
+    version: VERSION
+  };
+}
+
+/**
+ * [NEW] 접수 즉시 확인 메일 발송
+ */
+function sendConfirmationEmail(email, question) {
+  const subject = '[접수확인] 정밀 진단 분석이 시작되었습니다.';
+  
+  const body = `
+안녕하세요, ${SENDER_NAME}입니다.
+
+남겨주신 소중한 고민 내용을 정상적으로 접수하였습니다.
+현재 전문가가 귀하의 사주 원국과 2026년 대운을 정밀 대조하고 있습니다.
+
+[접수된 고민 내용]
+"${question || '전반적인 운세 분석'}"
+
+정밀 분석 및 비방 처방 리포트(12페이지)는 약 3시간 후에 
+이 메일로 다시 발송해 드릴 예정입니다.
+
+잠시만 기다려 주시면 정성을 다한 결과로 보답하겠습니다.
+감사합니다.
+
+---
+본 메일은 발신 전용입니다.
+`;
+
+  try {
+    MailApp.sendEmail({
+      to: email,
+      subject: subject,
+      body: body,
+      name: SENDER_NAME
+    });
+    Logger.log('확인 메일 발송 성공: ' + email);
+  } catch (e) {
+    Logger.log('확인 메일 발송 실패: ' + e.message);
+  }
 }
 
 /**
@@ -412,4 +487,43 @@ function setupSheet() {
   }
 
   Logger.log('✅ 초기 설정 완료!');
+}
+
+/**
+ * [DEBUG] 시트 연결 및 이메일 발송 직접 테스트 함수
+ * GAS 에디터에서 이 함수를 선택하고 '실행' 버튼을 누르세요.
+ */
+function debugDirect() {
+  const testEmail = 'panallaskr@gmail.com'; // 테스트할 메일 주소
+  
+  try {
+    // 1. 시트 연결 확인
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    Logger.log('시트 이름: ' + ss.getName());
+    
+    // 2. 이메일 발송 권한 확인
+    Logger.log('이메일 발송 시도 중...');
+    MailApp.sendEmail({
+      to: testEmail,
+      subject: '[GAS 테스트] 연결 확인 메일입니다.',
+      body: '구글 앱스 스크립트가 성공적으로 실행되었습니다. 시트 ID: ' + SPREADSHEET_ID,
+      name: 'AS-IS 테스트'
+    });
+    Logger.log('✅ 이메일 발송 성공 (메일함을 확인하세요)');
+    
+    // 3. 시트 쓰기 테스트
+    const sheet = ss.getSheets()[0];
+    sheet.getRange(sheet.getLastRow() + 1, 1).setValue('DEBUG_TEST_' + new Date().toLocaleString());
+    Logger.log('✅ 시트 쓰기 성공 (첫 번째 시트 마지막 줄 확인)');
+    
+    // 4. 할당량 확인
+    const quota = MailApp.getRemainingDailyQuota();
+    Logger.log('📅 남은 일일 이메일 발송 가능 횟수: ' + quota);
+    
+  } catch (e) {
+    Logger.log('❌ 테스트 실패: ' + e.message);
+    if (e.message.includes('permission') || e.message.includes('authorization')) {
+      Logger.log('👉 권한 설정이 필요합니다. 함수 실행 시 나타나는 팝업에서 모든 권한을 승인해주세요.');
+    }
+  }
 }
