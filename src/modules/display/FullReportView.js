@@ -401,26 +401,27 @@ function getExpertPrescription(cat, el) {
 
 function renderShareSection() {
   return `
-    <div class="report-page share-section">
-      <h2 class="section-title">🎁 행운을 나누면 복이 됩니다</h2>
-      <div class="share-card glass-morphism">
-        <p class="share-text">가족·친구에게도 운세 건강 리포트를 선물해보세요.</p>
-        <div class="share-buttons">
-          <button class="share-btn kakao" id="report-kakao-btn">
+    <div class="report-page share-section-page">
+      <div class="thankyou-share-section">
+        <h2 class="section-title">🎁 행운을 나누면 복이 됩니다</h2>
+        <p class="thankyou-share-text">가족·친구에게도 운세 건강 리포트를 선물해보세요.</p>
+        <div class="thankyou-share-buttons" style="margin-bottom: 2rem;">
+          <button class="thankyou-share-btn kakao" id="report-kakao-btn">
             💬 카카오톡 공유
           </button>
-          <button class="share-btn copy" id="report-copy-btn">
+          <button class="thankyou-share-btn copy" id="report-copy-btn">
             🔗 링크 복사
           </button>
         </div>
-        <div class="share-divider"></div>
-        <div class="home-action">
-          <p class="home-text">다른 사람의 운세도 궁금하신가요?</p>
-          <button class="share-btn home" id="report-home-btn">
+        
+        <div class="thankyou-divider"></div>
+        
+        <div class="thankyou-actions" style="margin-top: 2rem;">
+          <p class="thankyou-share-text">다른 사람의 운세도 궁금하신가요?</p>
+          <button class="thankyou-action-btn primary" id="report-home-btn">
             🔮 새로운 운세 검진하기
           </button>
         </div>
       </div>
     </div>
-  `;
 }
