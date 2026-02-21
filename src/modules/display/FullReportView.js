@@ -12,33 +12,33 @@ import bus from '@utils/eventBus.js';
 // ──────────────────────────────────────
 
 export function initFullReportView() {
-    bus.on(bus.Events.INTERPRET_COMPLETE, (data) => {
-        // 요약 데이터뿐만 아니라 상세 데이터까지 준비된 경우 (detail 존재 시)
-        const reportData = data.interpretation?.detail;
-        if (reportData) {
-            window._fullReportData = reportData;
-        }
-    });
+  bus.on(bus.Events.INTERPRET_COMPLETE, (data) => {
+    // 요약 데이터뿐만 아니라 상세 데이터까지 준비된 경우 (detail 존재 시)
+    const reportData = data.interpretation?.detail;
+    if (reportData) {
+      window._fullReportData = reportData;
+    }
+  });
 
-    // ThankYou 페이지 또는 외부에서 '정밀 진단서 보기' 클릭 시 트리거 (Legacy/Internal 지원)
-    bus.on('FULL_REPORT_SHOW', () => {
-        const data = window._fullReportData;
-        if (!data) {
-            console.error('[FullReport] 리포트 데이터가 없습니다.');
-            return;
-        }
+  // ThankYou 페이지 또는 외부에서 '정밀 진단서 보기' 클릭 시 트리거 (Legacy/Internal 지원)
+  bus.on('FULL_REPORT_SHOW', () => {
+    const data = window._fullReportData;
+    if (!data) {
+      console.error('[FullReport] 리포트 데이터가 없습니다.');
+      return;
+    }
 
-        const container = document.getElementById('full-report-section');
-        if (container) {
-            container.classList.remove('hidden');
-            renderFullReport(container, data);
+    const container = document.getElementById('full-report-section');
+    if (container) {
+      container.classList.remove('hidden');
+      renderFullReport(container, data);
 
-            // 섹션으로 이동
-            container.scrollIntoView({ behavior: 'smooth' });
-        }
-    });
+      // 섹션으로 이동
+      container.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
 
-    console.log('[FullReportView] 모듈 초기화 완료');
+  console.log('[FullReportView] 모듈 초기화 완료');
 }
 
 // ──────────────────────────────────────
@@ -46,7 +46,7 @@ export function initFullReportView() {
 // ──────────────────────────────────────
 
 export function renderFullReport(container, data) {
-    const html = `
+  const html = `
     <div class="full-report-wrapper">
       ${renderCover(data)}
       ${renderSajuAnalysis(data)}
@@ -56,13 +56,15 @@ export function renderFullReport(container, data) {
       ${renderConsultation(data)}
       ${renderPrescription(data)}
       
+      ${renderShareSection()}
+      
       <div class="report-footer">
         <p>본 진단서는 명리학 원리를 기반으로 작성되었으며, 참고 자료로만 활용하시기 바랍니다.</p>
         <p>&copy; 2026 병오년 운세 건강 정밀 진단 서비스</p>
       </div>
     </div>
   `;
-    container.innerHTML = html;
+  container.innerHTML = html;
 }
 
 // ──────────────────────────────────────
@@ -70,12 +72,12 @@ export function renderFullReport(container, data) {
 // ──────────────────────────────────────
 
 function renderCover(data) {
-    const bi = data.birthInput || {};
-    const genderKr = bi.gender === 'male' ? '남' : '여';
-    const hourKr = bi.hour !== undefined ? `${bi.hour}시` : '시간모름';
-    const pillars = `${data.pillars.year.pillar} ${data.pillars.month.pillar} ${data.pillars.day.pillar} ${data.pillars.hour.pillar}`;
+  const bi = data.birthInput || {};
+  const genderKr = bi.gender === 'male' ? '남' : '여';
+  const hourKr = bi.hour !== undefined ? `${bi.hour}시` : '시간모름';
+  const pillars = `${data.pillars.year.pillar} ${data.pillars.month.pillar} ${data.pillars.day.pillar} ${data.pillars.hour.pillar}`;
 
-    return `
+  return `
     <div class="report-page report-cover">
       <div class="cover-accent"></div>
       <h1 class="cover-title">2026 병오년<br><span>운세 건강 정밀 진단서</span></h1>
@@ -94,18 +96,18 @@ function renderCover(data) {
 // ──────────────────────────────────────
 
 function renderSajuAnalysis(data) {
-    const p = data.pillars;
-    const elements = data.elements || {};
-    const yongShen = data.yongShen || {};
+  const p = data.pillars;
+  const elements = data.elements || {};
+  const yongShen = data.yongShen || {};
 
-    const colNames = ['시주(時)', '일주(日)', '월주(月)', '년주(年)'];
-    const keys = ['hour', 'day', 'month', 'year'];
+  const colNames = ['시주(時)', '일주(日)', '월주(月)', '년주(年)'];
+  const keys = ['hour', 'day', 'month', 'year'];
 
-    const elementColors = {
-        '木': '#4caf50', '火': '#f44336', '土': '#ffc107', '金': '#e0e0e0', '水': '#2196f3'
-    };
+  const elementColors = {
+    '木': '#4caf50', '火': '#f44336', '土': '#ffc107', '金': '#e0e0e0', '水': '#2196f3'
+  };
 
-    return `
+  return `
     <div class="report-page">
       <h2 class="section-title">📜 사주 원국 분석</h2>
       
@@ -156,13 +158,13 @@ function renderSajuAnalysis(data) {
 // ──────────────────────────────────────
 
 function renderOverall(data) {
-    const score = data.fortuneScore || 0;
-    let gradeClass = 'grade-normal';
-    if (score >= 80) gradeClass = 'grade-best';
-    else if (score >= 60) gradeClass = 'grade-good';
-    else if (score < 40) gradeClass = 'grade-warning';
+  const score = data.fortuneScore || 0;
+  let gradeClass = 'grade-normal';
+  if (score >= 80) gradeClass = 'grade-best';
+  else if (score >= 60) gradeClass = 'grade-good';
+  else if (score < 40) gradeClass = 'grade-warning';
 
-    return `
+  return `
     <div class="report-page">
       <h2 class="section-title">🌟 2026년 종합 총평</h2>
       <div class="overall-score-banner ${gradeClass}">
@@ -182,20 +184,20 @@ function renderOverall(data) {
 // ──────────────────────────────────────
 
 function renderCategories(data) {
-    const cats = data.categories || {};
-    const meta = {
-        wealth: { name: '재물·살림운', icon: '💰' },
-        love: { name: '가족·인연운', icon: '🤝' },
-        health: { name: '건강·몸 관리운', icon: '🩺' },
-        career: { name: '재물·노후운', icon: '🏦' },
-        study: { name: '자식·손주운', icon: '👨‍👩‍👧‍👦' },
-        family: { name: '가정·화목운', icon: '🏡' },
-    };
+  const cats = data.categories || {};
+  const meta = {
+    wealth: { name: '재물·살림운', icon: '💰' },
+    love: { name: '가족·인연운', icon: '🤝' },
+    health: { name: '건강·몸 관리운', icon: '🩺' },
+    career: { name: '재물·노후운', icon: '🏦' },
+    study: { name: '자식·손주운', icon: '👨‍👩‍👧‍👦' },
+    family: { name: '가정·화목운', icon: '🏡' },
+  };
 
-    return Object.entries(meta).map(([id, m]) => {
-        const d = cats[id];
-        if (!d) return '';
-        return `
+  return Object.entries(meta).map(([id, m]) => {
+    const d = cats[id];
+    if (!d) return '';
+    return `
       <div class="report-page">
         <h2 class="section-title">${m.icon} ${m.name}</h2>
         <div class="cat-summary-box">${d.text || ''}</div>
@@ -220,7 +222,7 @@ function renderCategories(data) {
         ` : ''}
       </div>
     `;
-    }).join('');
+  }).join('');
 }
 
 // ──────────────────────────────────────
@@ -228,10 +230,10 @@ function renderCategories(data) {
 // ──────────────────────────────────────
 
 function renderMonthly(data) {
-    const months = data.monthly || [];
-    if (!months.length) return '';
+  const months = data.monthly || [];
+  if (!months.length) return '';
 
-    const renderMonthCard = (m) => `
+  const renderMonthCard = (m) => `
     <div class="month-card">
       <div class="month-head">
         <span class="month-num">${m.month}월</span>
@@ -245,7 +247,7 @@ function renderMonthly(data) {
     </div>
   `;
 
-    return `
+  return `
     <div class="report-page">
       <h2 class="section-title">📅 2026년 월별 흐름</h2>
       <div class="monthly-grid">
@@ -260,8 +262,8 @@ function renderMonthly(data) {
 // ──────────────────────────────────────
 
 function renderPrescription(data) {
-    const lucky = data.lucky || {};
-    return `
+  const lucky = data.lucky || {};
+  return `
     <div class="report-page last-page">
       <h2 class="section-title">🏥 종합 운세 처방전</h2>
       
@@ -291,28 +293,28 @@ function renderPrescription(data) {
 // ──────────────────────────────────────
 
 function renderConsultation(data) {
-    const inquiry = data.inquiry || {};
-    const category = inquiry.category || 'general';
-    const question = inquiry.question || '내년 전반적인 운세가 궁금합니다.';
+  const inquiry = data.inquiry || {};
+  const category = inquiry.category || 'general';
+  const question = inquiry.question || '내년 전반적인 운세가 궁금합니다.';
 
-    // 용신(用神) 기반 오행 추출 (Object/String 대응)
-    const ysRaw = data.yongShen?.primary;
-    const yongShen = typeof ysRaw === 'object' ? (ysRaw.korean || '') : (ysRaw || '');
-    const yongShenElement = yongShen.charAt(0); // '목', '화', '토', '금', '수'
+  // 용신(用神) 기반 오행 추출 (Object/String 대응)
+  const ysRaw = data.yongShen?.primary;
+  const yongShen = typeof ysRaw === 'object' ? (ysRaw.korean || '') : (ysRaw || '');
+  const yongShenElement = yongShen.charAt(0); // '목', '화', '토', '금', '수'
 
-    const prescription = getExpertPrescription(category, yongShenElement);
+  const prescription = getExpertPrescription(category, yongShenElement);
 
-    const categoryNames = {
-        wealth: '재물·사업',
-        health: '건강·수명',
-        love: '인연·부부',
-        career: '사회·명예',
-        study: '학업·자식',
-        family: '가정·화목',
-        general: '종합 운세'
-    };
+  const categoryNames = {
+    wealth: '재물·사업',
+    health: '건강·수명',
+    love: '인연·부부',
+    career: '사회·명예',
+    study: '학업·자식',
+    family: '가정·화목',
+    general: '종합 운세'
+  };
 
-    return `
+  return `
     <div class="report-page consultation-section">
       <h2 class="section-title">✍️ 전문가 분석 및 비방(秘方)</h2>
       
@@ -367,28 +369,58 @@ function renderConsultation(data) {
  * 카테고리별 x 용신별 맞춤 처방 데이터 매핑
  */
 function getExpertPrescription(cat, el) {
-    const dataMap = {
-        wealth: {
-            '목': { action: '동쪽 방향에 청색 계열의 물건을 두거나 화분을 배치하여 재운의 발복을 꾀하십시오.', tip: '목재 재질의 지갑이나 소품을 활용하면 자금 흐름이 원활해집니다.' },
-            '화': { action: '붉은색 지갑이나 밝은 조명을 활용하여 정체된 금전운을 깨우는 처방을 드립니다.', tip: '중요한 계약 시 붉은색 넥타이나 스카프를 착용하십시오.' },
-            '토': { action: '거실 중앙이나 침실에 노란색 계열의 도자기나 흙 소재 소품을 두어 재물을 저장하십시오.', tip: '안정적인 부동산 투자나 저축이 횡재수보다 유리한 해입니다.' },
-            '금': { action: '서쪽 방향에 금속 장식품이나 흰색 액자를 두어 결단력 있는 투자를 도모하십시오.', tip: '시계나 귀금속을 착용하여 금(金)의 기운을 몸에 지니는 것이 좋습니다.' },
-            '수': { action: '북쪽 방향에 어두운 색상의 소품이나 물 이미지를 배치하여 재물이 새지 않게 하십시오.', tip: '유동성이 큰 투자보다는 현금을 확보하는 지혜가 필요합니다.' }
-        },
-        health: {
-            '목': { action: '간 건강을 위해 새벽 산책을 즐기시고, 초록색 의복이 생기를 돋우는 데 도움을 줍니다.', tip: '동쪽으로 머리를 두고 취침하며 신맛이 나는 과일을 섭취하십시오.' },
-            '화': { action: '심혈관 건강에 각별히 유의하시고, 쓴맛이 나는 차를 통해 몸의 열기를 다스리십시오.', tip: '한낮의 무리한 활동보다는 조용한 명상과 수면이 필수입니다.' },
-            '토': { action: '비위(위장) 기능을 보강하기 위해 흙을 밟는 맨발 걷기나 황토 찜질을 추천합니다.', tip: '단맛이 나는 단호박이나 뿌리 채소를 섭취하여 기력을 보충하십시오.' },
-            '금': { action: '호흡기와 대장 건강을 위해 흰색 침구류를 사용하시고 실내 공기 정화에 힘쓰십시오.', tip: '매운맛이 나는 음식을 적절히 섭취하여 폐 기능을 활성화하십시오.' },
-            '수': { action: '신장과 방광 기운을 위해 물을 자주 마시고 검은색 콩이나 깨를 즐겨 보십시오.', tip: '밤늦게까지 활동하기보다 일찍 잠자리에 들어 수(水)의 기운을 보존하십시오.' }
-        }
-    };
+  const dataMap = {
+    wealth: {
+      '목': { action: '동쪽 방향에 청색 계열의 물건을 두거나 화분을 배치하여 재운의 발복을 꾀하십시오.', tip: '목재 재질의 지갑이나 소품을 활용하면 자금 흐름이 원활해집니다.' },
+      '화': { action: '붉은색 지갑이나 밝은 조명을 활용하여 정체된 금전운을 깨우는 처방을 드립니다.', tip: '중요한 계약 시 붉은색 넥타이나 스카프를 착용하십시오.' },
+      '토': { action: '거실 중앙이나 침실에 노란색 계열의 도자기나 흙 소재 소품을 두어 재물을 저장하십시오.', tip: '안정적인 부동산 투자나 저축이 횡재수보다 유리한 해입니다.' },
+      '금': { action: '서쪽 방향에 금속 장식품이나 흰색 액자를 두어 결단력 있는 투자를 도모하십시오.', tip: '시계나 귀금속을 착용하여 금(金)의 기운을 몸에 지니는 것이 좋습니다.' },
+      '수': { action: '북쪽 방향에 어두운 색상의 소품이나 물 이미지를 배치하여 재물이 새지 않게 하십시오.', tip: '유동성이 큰 투자보다는 현금을 확보하는 지혜가 필요합니다.' }
+    },
+    health: {
+      '목': { action: '간 건강을 위해 새벽 산책을 즐기시고, 초록색 의복이 생기를 돋우는 데 도움을 줍니다.', tip: '동쪽으로 머리를 두고 취침하며 신맛이 나는 과일을 섭취하십시오.' },
+      '화': { action: '심혈관 건강에 각별히 유의하시고, 쓴맛이 나는 차를 통해 몸의 열기를 다스리십시오.', tip: '한낮의 무리한 활동보다는 조용한 명상과 수면이 필수입니다.' },
+      '토': { action: '비위(위장) 기능을 보강하기 위해 흙을 밟는 맨발 걷기나 황토 찜질을 추천합니다.', tip: '단맛이 나는 단호박이나 뿌리 채소를 섭취하여 기력을 보충하십시오.' },
+      '금': { action: '호흡기와 대장 건강을 위해 흰색 침구류를 사용하시고 실내 공기 정화에 힘쓰십시오.', tip: '매운맛이 나는 음식을 적절히 섭취하여 폐 기능을 활성화하십시오.' },
+      '수': { action: '신장과 방광 기운을 위해 물을 자주 마시고 검은색 콩이나 깨를 즐겨 보십시오.', tip: '밤늦게까지 활동하기보다 일찍 잠자리에 들어 수(水)의 기운을 보존하십시오.' }
+    }
+  };
 
-    // 카테고리 매핑 (없을 경우 wealth/wealth-like로 대응)
-    const categoryGroup = dataMap[cat] || dataMap.wealth;
+  // 카테고리 매핑 (없을 경우 wealth/wealth-like로 대응)
+  const categoryGroup = dataMap[cat] || dataMap.wealth;
 
-    return categoryGroup[el] || {
-        action: '주변 환경을 청결히 하고 밝은 기운을 유지하여 들어오는 복을 맞이하십시오.',
-        tip: '매일 아침 10분간의 명상이 전체적인 운의 흐름을 개선합니다.'
-    };
+  return categoryGroup[el] || {
+    action: '주변 환경을 청결히 하고 밝은 기운을 유지하여 들어오는 복을 맞이하십시오.',
+    tip: '매일 아침 10분간의 명상이 전체적인 운의 흐름을 개선합니다.'
+  };
+}
+
+// ──────────────────────────────────────
+// 섹션 14: [NEW] 친구 공유 및 재검진 (Phase 9)
+// ──────────────────────────────────────
+
+function renderShareSection() {
+  return `
+    <div class="report-page share-section">
+      <h2 class="section-title">🎁 행운을 나누면 복이 됩니다</h2>
+      <div class="share-card glass-morphism">
+        <p class="share-text">가족·친구에게도 운세 건강 리포트를 선물해보세요.</p>
+        <div class="share-buttons">
+          <button class="share-btn kakao" id="report-kakao-btn">
+            💬 카카오톡 공유
+          </button>
+          <button class="share-btn copy" id="report-copy-btn">
+            🔗 링크 복사
+          </button>
+        </div>
+        <div class="share-divider"></div>
+        <div class="home-action">
+          <p class="home-text">다른 사람의 운세도 궁금하신가요?</p>
+          <button class="share-btn home" id="report-home-btn">
+            🔮 새로운 운세 검진하기
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
 }

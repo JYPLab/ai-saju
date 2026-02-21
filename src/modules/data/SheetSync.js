@@ -64,7 +64,6 @@ async function postToSheet(payload) {
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-            console.log(`[SheetSync] 전송 시도 (${attempt}/${MAX_RETRIES}) — 대상: ${SHEET_URL}`);
             // Google Apps Script는 CORS preflight를 지원하지 않으므로
             // text/plain으로 보내 simple request로 처리 (preflight 회피)
             const response = await fetch(SHEET_URL, {

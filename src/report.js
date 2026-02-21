@@ -60,18 +60,74 @@ async function initReport() {
         // 3. 리포트 렌더링
         renderFullReport(reportRoot, reportData);
 
-        // 4. 브라우저 인쇄 지원을 위한 팁
+        // 4. 이벤트 핸들러 연결 (공유 및 홈 이동)
+        attachReportHandlers();
+
+        // 5. 브라우저 인쇄 지원을 위한 팁
         console.log('💡 팁: 브라우저 인쇄 기능을 사용해 PDF로 저장할 수 있습니다.');
 
     } catch (error) {
         console.error('[Report] 초기화 오류:', error);
-        reportRoot.innerHTML = `
-            <div class="report-error">
-                <h2>오류가 발생했습니다</h2>
-                <p>${error.message}</p>
-                <button onclick="location.reload()">새로고침</button>
-            </div>
-        `;
+        const reportRoot = document.getElementById('report-root');
+        if (reportRoot) {
+            reportRoot.innerHTML = `
+                <div class="report-error">
+                    <h2>오류가 발생했습니다</h2>
+                    <p>${error.message}</p>
+                    <button onclick="location.reload()">새로고침</button>
+                </div>
+            `;
+        }
+    }
+}
+
+// ──────────────────────────────────────
+// 이벤트 핸들러 (공유 및 링크 복사)
+// ──────────────────────────────────────
+
+function attachReportHandlers() {
+    // 카카오톡 공유
+    const kakaoBtn = document.getElementById('report-kakao-btn');
+    if (kakaoBtn) {
+        kakaoBtn.addEventListener('click', () => {
+            const shareData = {
+                title: '🔮 2026 병오년 운세 건강 정밀 진단서',
+                text: '전문가가 직접 검수한 나의 2026년 운세 진단서가 도착했습니다. 직접 확인해보세요! 🎊',
+                url: window.location.origin,
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => { });
+            } else {
+                const kakaoUrl = `https://story.kakao.com/share?url=${encodeURIComponent(shareData.url)}`;
+                window.open(kakaoUrl, '_blank', 'width=600,height=400');
+            }
+        });
+    }
+
+    // 링크 복사
+    const copyBtn = document.getElementById('report-copy-btn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+            const url = window.location.origin;
+            navigator.clipboard.writeText(url).then(() => {
+                const original = copyBtn.textContent;
+                copyBtn.textContent = '✅ 복사 완료!';
+                setTimeout(() => {
+                    copyBtn.textContent = original;
+                }, 2000);
+            }).catch(() => {
+                prompt('아래 주소를 복사하세요:', url);
+            });
+        });
+    }
+
+    // 메인으로 이동 (새 검진)
+    const homeBtn = document.getElementById('report-home-btn');
+    if (homeBtn) {
+        homeBtn.addEventListener('click', () => {
+            window.location.href = './index.html';
+        });
     }
 }
 

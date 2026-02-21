@@ -17,11 +17,10 @@
  * ──────────────────────────────────────
  */
 
-// ⚠️ 아래 ID를 본인의 스프레드시트 ID로 바꾸세요
+// ⚠️ 아래 ID를 본인의 스프레드시트 ID로 바꾸세요 (브라우저 주소창에서 확인 가능)
 const SPREADSHEET_ID = '14pDIwzlMpL2FRJMRvvQH3iadW5FRbqsBXxu34QSoiMM';
 const MAX_ROWS_PER_TAB = 300;
 const SENDER_NAME = '2026 병오년 운세 건강 검진 팀';
-const VERSION = '2026-02-20-V3'; // 이메일 강화 버전
 
 // ──────────────────────────────────────
 // POST 핸들러
@@ -209,8 +208,7 @@ function handleInquiry(ss, data) {
           updated: true, 
           scheduled_at: scheduledTime,
           email_sent: emailSent,
-          email_error: emailError,
-          version: VERSION
+          email_error: emailError
         };
       }
     }
@@ -246,8 +244,7 @@ function handleInquiry(ss, data) {
     updated: false, 
     fallback: true, 
     scheduled_at: scheduledTime,
-    email_sent: fallbackEmailSent,
-    version: VERSION
+    email_sent: fallbackEmailSent
   };
 }
 
@@ -346,8 +343,8 @@ function sendScheduledReports() {
  * 리포트 이메일 발송 템플릿
  */
 function sendReportEmail(email, sessionId) {
-  // 실제 배포된 웹 앱의 URL 또는 리포트 전용 URL
-  const reportUrl = 'https://ai-saju-2026.web.app/report.html'; // 예시 URL
+  // 실제 배포된 리포트 전용 URL (Vercel 주소로 업데이트됨)
+  const reportUrl = 'https://ai-saju-pied.vercel.app/report.html'; 
   const signedUrl = reportUrl + '?id=' + sessionId;
 
   const subject = '[병오년 운세 검진] 정밀 진단서 분석이 완료되었습니다.';
@@ -490,40 +487,50 @@ function setupSheet() {
 }
 
 /**
- * [DEBUG] 시트 연결 및 이메일 발송 직접 테스트 함수
- * GAS 에디터에서 이 함수를 선택하고 '실행' 버튼을 누르세요.
+ * [DEBUG] 이메일 발송 테스트 함수
+ * GAS 에디터에서 이 함수를 선택하고 '실행'을 눌러보세요.
  */
-function debugDirect() {
-  const testEmail = 'panallaskr@gmail.com'; // 테스트할 메일 주소
+function testEmailFlow() {
+  const testEmail = Session.getActiveUser().getEmail();
+  Logger.log('테스트 이메일 발송 시작: ' + testEmail);
   
   try {
-    // 1. 시트 연결 확인
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    Logger.log('시트 이름: ' + ss.getName());
-    
-    // 2. 이메일 발송 권한 확인
-    Logger.log('이메일 발송 시도 중...');
-    MailApp.sendEmail({
-      to: testEmail,
-      subject: '[GAS 테스트] 연결 확인 메일입니다.',
-      body: '구글 앱스 스크립트가 성공적으로 실행되었습니다. 시트 ID: ' + SPREADSHEET_ID,
-      name: 'AS-IS 테스트'
-    });
-    Logger.log('✅ 이메일 발송 성공 (메일함을 확인하세요)');
-    
-    // 3. 시트 쓰기 테스트
-    const sheet = ss.getSheets()[0];
-    sheet.getRange(sheet.getLastRow() + 1, 1).setValue('DEBUG_TEST_' + new Date().toLocaleString());
-    Logger.log('✅ 시트 쓰기 성공 (첫 번째 시트 마지막 줄 확인)');
-    
-    // 4. 할당량 확인
-    const quota = MailApp.getRemainingDailyQuota();
-    Logger.log('📅 남은 일일 이메일 발송 가능 횟수: ' + quota);
-    
+    sendConfirmationEmail(testEmail, '이것은 시스템 동작 확인을 위한 테스트 질문입니다.');
+    Logger.log('✅ 테스트 메일 발송 명령 완료. 수신함을 확인하세요.');
   } catch (e) {
-    Logger.log('❌ 테스트 실패: ' + e.message);
-    if (e.message.includes('permission') || e.message.includes('authorization')) {
-      Logger.log('👉 권한 설정이 필요합니다. 함수 실행 시 나타나는 팝업에서 모든 권한을 승인해주세요.');
+    Logger.log('❌ 테스트 메일 발송 실패: ' + e.message);
+  }
+}
+
+/**
+ * [DEBUG] 가장 최근의 미발송 리포트 즉시 발송 테스트
+ * 3시간을 기다리지 않고, 현재 시트에서 'no' 상태인 가장 최근 항목을 보냅니다.
+ */
+function forceSendRecentReport() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheets().filter(s => s.getName().startsWith('세션'))[0];
+  if (!sheet) return Logger.log('❌ 세션 시트를 찾을 수 없습니다.');
+
+  const data = sheet.getDataRange().getValues();
+  for (let i = data.length - 1; i >= 1; i--) {
+    const row = data[i];
+    const status = row[2];
+    const email = row[12];
+    const isSent = row[17];
+
+    if (status === 'inquiry_submitted' && isSent === 'no') {
+      Logger.log('최근 미발송 건 발견: ' + email + ' (ID: ' + row[0] + ')');
+      try {
+        sendReportEmail(email, row[0]);
+        sheet.getRange(i + 1, 18).setValue('yes');
+        sheet.getRange(i + 1, 3).setValue('report_sent');
+        Logger.log('✅ 강제 발송 완료!');
+        return;
+      } catch (e) {
+        Logger.log('❌ 강제 발송 실패: ' + e.message);
+        return;
+      }
     }
   }
+  Logger.log('⚠️ 발송 대기 중인(no) 항목이 없습니다.');
 }
