@@ -424,4 +424,5 @@ function renderShareSection() {
         </div>
       </div>
     </div>
+  `;
 }
